@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="WoltLab Community Framework Package" default="build" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <!-- load package.xml properties -->
+    <xmlproperty file="package.xml" />
+
+    <!-- set package name & tmp path variables -->
+    <property name="build.dir" location="build" />
+    <property name="build.name" value="${package(name)}_${package.packageinformation.version}" />
+    <property name="closure.dir" location="../closure-compiler" />
+    <property name="src.tmp" location="tmp" />
+
+    <!-- set path variables for file based pips-->
+    <property name="src.acptemplates" location="acptemplates" />
+    <property name="src.templates" location="templates" />
+    <property name="src.files" location="files" />
+
+    <!-- set path variables for xml based pips-->
+    <property name="src.lang" location="language" />
+    <property name="src.xml" location="xml" />
+    <!--set path variables for optional/required tar packages-->
+    <property name="src.optionals" location="optionals" />
+    <property name="src.requirements" location="requirements" />
+
+    <!-- tar & delete tmp folder -->
+    <target name="build" depends="js.minify,tar">
+        <delete dir="${src.tmp}" />
+    </target>
+
+    <!-- minify js -->
+    <target name="js.minify">
+        <echo level="info">Minifying JavaScript resources</echo>
+
+        <!-- run closure compiler -->
+        <apply executable="java" parallel="false">
+            <!-- file set to iterate through -->
+            <fileset dir="${src.files}/js" includes="**/*.js" excludes="**/*.min.js" />
+            <mapper type="glob" from="*.js" to="${src.files}/js/*.min.js" />
+
+            <!-- java command line arguments -->
+            <arg line="-jar '${closure.dir}/compiler.jar'" />
+            <arg line="--compilation_level simple" />
+            <arg line="--warning_level quiet" />
+            <arg line="--externs '${closure.dir}/externs/jquery-1.9.1.js'" />
+            <arg line="--js" /><srcfile />
+            <arg line="--js_output_file" /><targetfile />
+        </apply>
+    </target>
+
+
+
+
+    <!-- create package -->
+    <target name="tar">
+        <!-- tar file based pips-->
+        <tar-if-exist destfile="${src.tmp}/files.tar" basedir="${src.files}" />
+        <tar-if-exist destfile="${src.tmp}/acptemplates.tar" basedir="${src.acptemplates}" />
+        <tar-if-exist destfile="${src.tmp}/templates.tar" basedir="${src.templates}" />
+
+        <!--tar package-->
+        <tar destfile="${build.dir}/${build.name}.tar.gz" compression="gzip">
+            <!--include xml based pips-->
+            <tarfileset erroronmissingdir="false" dir="${src.lang}" includes="*.xml" prefix="language" />
+            <tarfileset erroronmissingdir="false" dir="${src.xml}" includes="*.xml" prefix="xml"/>
+
+            <!-- include tmp folder with file based pip tar files -->
+            <tarfileset erroronmissingdir="false" dir="${src.tmp}" includes="*.tar" />
+
+            <!-- include optional/required packages-->
+            <tarfileset erroronmissingdir="false" dir="${src.optionals}" includes="*.tar" prefix="optionals" />
+            <tarfileset erroronmissingdir="false" dir="${src.requirements}" includes="*.tar" prefix="requirements" />
+
+            <!-- include sql and xml files, except build.xml-->
+            <tarfileset dir="." includes="*.xml,*.sql" excludes="build.xml"/>
+        </tar>
+    </target>
+
+    <macrodef name="tar-if-exist">
+        <attribute name="destfile" />
+        <attribute name="basedir" default="." />
+        <sequential>
+            <local name="file.exists" />
+            <condition property="file.exists">
+                <resourceexists>
+                    <file file="@{basedir}" />
+                </resourceexists>
+            </condition>
+            <tar if:true="${file.exists}" destfile="@{destfile}" basedir="@{basedir}" />
+            <echo unless:true="${file.exists}">Skipping @{basedir} since it does not exist.</echo>
+        </sequential>
+    </macrodef>
+</project>

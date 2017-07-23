@@ -1,0 +1,7 @@
+#errorMessage {
+  @extend .error;
+}
+
+body#tpl_wcf_permissionDenied > div#pageContainer > section#main > div.layoutBoundary > div#content > div.section > p {
+  @extend .error;
+}

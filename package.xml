@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package name="de.elyday.wsc.errorBox" xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/vortex/package.xsd">
+    <packageinformation>
+        <packagename languagecode="de">Error Box</packagename>
+        <packagename languagecode="en">Error Box</packagename>
+        <packagedescription languagecode="de">Dieses Plugin fügt jeder Error Seite wieder die rote Error Box hinzu.</packagedescription>
+        <packagedescription languagecode="en">This plugin adds the red error box to each Error page.</packagedescription>
+        <version>1.0.0</version>
+        <date>2017-07-13</date>
+    </packageinformation>
+
+    <authorinformation>
+        <author>Lars R.</author>
+        <authorurl>http://elyday.net</authorurl>
+    </authorinformation>
+
+    <requiredpackages>
+        <requiredpackage minversion="3.0.0">com.woltlab.wcf</requiredpackage>
+    </requiredpackages>
+
+    <excludedpackages>
+        <excludedpackage version="3.1.0 Alpha 1">com.woltlab.wcf</excludedpackage>
+    </excludedpackages>
+
+    <instructions type="install">
+        <instruction type="file"/>
+    </instructions>
+</package>
